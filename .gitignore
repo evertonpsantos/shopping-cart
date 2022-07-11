@@ -7,3 +7,6 @@ node_modules/
 cypress/reports
 cypress/screenshots
 coverage/
+.gitignore
+package.json
+package-lock.json
