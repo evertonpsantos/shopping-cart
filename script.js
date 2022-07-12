@@ -1,6 +1,9 @@
 // const { fetchProducts } = require('./helpers/fetchProducts');
 
+// const { fetchItem } = require("./helpers/fetchItem");
+
 const itemsSection = document.querySelector('.items');
+const cartSection = document.querySelector('.cart__items');
 
 const createProductImageElement = (imageSource) => {
   const img = document.createElement('img');
@@ -38,7 +41,8 @@ const createItems = async () => {
 const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
 
 const cartItemClickListener = (event) => {
-  // coloque seu código aqui
+  const product = event.target;
+  product.remove();
 };
 
 const createCartItemElement = ({ sku, name, salePrice }) => {
@@ -49,4 +53,20 @@ const createCartItemElement = ({ sku, name, salePrice }) => {
   return li;
 };
 
-window.onload = () => { createItems(); };
+const addingListeners = () => {
+  const addButtons = document.getElementsByClassName('item__add');
+  [...addButtons].forEach((element) => {
+    element.addEventListener('click', async (e) => {
+      const clicked = e.target.parentElement;
+      const sku = getSkuFromProductItem(clicked);
+      const product = await fetchItem(sku);
+      const { id, title, price } = product;
+      cartSection.appendChild(createCartItemElement({ sku: id, name: title, salePrice: price }));
+    });
+  }); 
+};
+
+window.onload = async () => { 
+  await createItems(); 
+  addingListeners(); 
+};
