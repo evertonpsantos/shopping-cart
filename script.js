@@ -46,12 +46,6 @@ const createItems = async () => {
 
 const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
 
-const removeFromStorage = (sku) => {
-  const cartItems = JSON.parse(getSavedCartItems('cartItems'));
-  const filtered = cartItems.filter((item) => item !== sku);
-  return saveCartItems(filtered);
-};
-
 const cartItemClickListener = (event) => {
   const product = event.target;
   product.remove();
@@ -62,7 +56,6 @@ const createCartItemElement = ({ sku, name, salePrice }) => {
   li.className = 'cart__item';
   li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
   li.addEventListener('click', cartItemClickListener);
-  li.addEventListener('click', removeFromStorage(sku));
   return li;
 };
 
