@@ -12,11 +12,11 @@ const itemsSection = document.querySelector('.items');
 const cartItemSection = document.querySelector('.cart__items');
 const priceSection = document.querySelector('.total-price');
 
-const getPrices = () => {
+const getPrices = async () => {
   let sum = 0;
   const cartItems = JSON.parse(getSavedCartItems('cartItems'));
   if (cartItems.length === 0) {
-    const totalPhrase = `Preço Total: ${Math.round(sum)}`;
+    const totalPhrase = `Preço Total: ${sum}`;
     priceSection.innerText = totalPhrase;
   }
   cartItems.forEach(async (item) => {
@@ -105,7 +105,9 @@ window.onload = async () => {
   addingListeners(); 
   if (localStorage.cartItems) {
   const cartItems = JSON.parse(getSavedCartItems('cartItems'));
-  cartItems.forEach((cartItem) => createCartItem(cartItem));
-  getPrices();
+  cartItems.forEach(async (cartItem) => {
+    await createCartItem(cartItem);
+    await getPrices();
+  });
   }
 };
