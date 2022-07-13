@@ -48,6 +48,9 @@ const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').inn
 
 const cartItemClickListener = (event) => {
   const product = event.target;
+  const cartItems = JSON.parse(getSavedCartItems('cartItems'));
+  const filtered = cartItems.filter((item) => !product.innerText.includes(item));
+  saveCartItems(filtered);
   product.remove();
 };
 
