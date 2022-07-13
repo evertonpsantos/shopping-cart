@@ -1,5 +1,11 @@
 // const { fetchProducts } = require('./helpers/fetchProducts');
 
+// const saveCartItems = require("./helpers/saveCartItems");
+
+// const getSavedCartItems = require("./helpers/getSavedCartItems");
+
+// const saveCartItems = require("./helpers/saveCartItems");
+
 // const { fetchItem } = require("./helpers/fetchItem");
 
 const itemsSection = document.querySelector('.items');
@@ -40,6 +46,12 @@ const createItems = async () => {
 
 const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
 
+const removeFromStorage = (sku) => {
+  const cartItems = JSON.parse(getSavedCartItems('cartItems'));
+  const filtered = cartItems.filter((item) => item !== sku);
+  return saveCartItems(filtered);
+};
+
 const cartItemClickListener = (event) => {
   const product = event.target;
   product.remove();
@@ -50,18 +62,26 @@ const createCartItemElement = ({ sku, name, salePrice }) => {
   li.className = 'cart__item';
   li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
   li.addEventListener('click', cartItemClickListener);
+  li.addEventListener('click', removeFromStorage(sku));
   return li;
+};
+
+const createCartItem = async (sku) => {
+  const product = await fetchItem(sku);
+  const { id, title, price } = product;
+  cartSection.appendChild(createCartItemElement({ sku: id, name: title, salePrice: price }));
 };
 
 const addingListeners = () => {
   const addButtons = document.getElementsByClassName('item__add');
+  const items = [];
   [...addButtons].forEach((element) => {
     element.addEventListener('click', async (e) => {
       const clicked = e.target.parentElement;
       const sku = getSkuFromProductItem(clicked);
-      const product = await fetchItem(sku);
-      const { id, title, price } = product;
-      cartSection.appendChild(createCartItemElement({ sku: id, name: title, salePrice: price }));
+      items.push(sku);
+      saveCartItems(items);
+      createCartItem(sku);
     });
   }); 
 };
@@ -69,4 +89,8 @@ const addingListeners = () => {
 window.onload = async () => { 
   await createItems(); 
   addingListeners(); 
+  if (localStorage.cartItems) {
+  const cartItems = JSON.parse(getSavedCartItems('cartItems'));
+  cartItems.forEach((cartItem) => createCartItem(cartItem));
+  }
 };
