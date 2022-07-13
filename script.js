@@ -9,7 +9,6 @@
 // const { fetchItem } = require("./helpers/fetchItem");
 
 const itemsSection = document.querySelector('.items');
-// const cartSection = document.querySelector('.cart');
 const cartItemSection = document.querySelector('.cart__items');
 const priceSection = document.querySelector('.total-price');
 const emptyCartButton = document.querySelector('.empty-cart');
@@ -27,6 +26,18 @@ const getPrices = async () => {
     const totalPhrase = `Preço Total: ${Math.round(sum)}`;
     priceSection.innerText = totalPhrase;
   });
+};
+
+const addingLoadingElement = () => {
+  const loadingElement = document.createElement('div');
+  loadingElement.className = 'loading';
+  loadingElement.innerText = 'carregando...';
+  itemsSection.appendChild(loadingElement);
+};
+
+const removingLoadingElement = () => {
+  const loadingElement = document.querySelector('.loading');
+  loadingElement.remove();
 };
 
 const createProductImageElement = (imageSource) => {
@@ -69,8 +80,8 @@ const cartItemClickListener = async (event) => {
   const cartItems = JSON.parse(getSavedCartItems('cartItems'));
   const filtered = cartItems.filter((item) => !product.innerText.includes(item));
   await saveCartItems(filtered);
-  getPrices();
   product.remove();
+  getPrices();
 };
 
 const createCartItemElement = ({ sku, name, salePrice }) => {
@@ -107,13 +118,15 @@ const emptyCart = () => {
     const cartItems = document.getElementsByClassName('cart__item');
     [...cartItems].forEach((item) => item.remove());
     localStorage.removeItem('cartItems');
-    priceSection.innerHTML = '';
+    priceSection.innerText = 'Preço Total: 0';
   });
 };
 
 window.onload = async () => { 
+  addingLoadingElement();
   await createItems(); 
   addingListeners(); 
+  removingLoadingElement();
   if (localStorage.cartItems) {
     const cartItems = JSON.parse(getSavedCartItems('cartItems'));
     cartItems.forEach(async (cartItem) => {
