@@ -9,13 +9,15 @@
 // const { fetchItem } = require("./helpers/fetchItem");
 
 const itemsSection = document.querySelector('.items');
+// const cartSection = document.querySelector('.cart');
 const cartItemSection = document.querySelector('.cart__items');
 const priceSection = document.querySelector('.total-price');
+const emptyCartButton = document.querySelector('.empty-cart');
 
 const getPrices = async () => {
   let sum = 0;
   const cartItems = JSON.parse(getSavedCartItems('cartItems'));
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0 || !cartItems) {
     const totalPhrase = `Preço Total: ${sum}`;
     priceSection.innerText = totalPhrase;
   }
@@ -62,11 +64,11 @@ const createItems = async () => {
 
 const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
 
-const cartItemClickListener = (event) => {
+const cartItemClickListener = async (event) => {
   const product = event.target;
   const cartItems = JSON.parse(getSavedCartItems('cartItems'));
   const filtered = cartItems.filter((item) => !product.innerText.includes(item));
-  saveCartItems(filtered);
+  await saveCartItems(filtered);
   getPrices();
   product.remove();
 };
@@ -93,21 +95,31 @@ const addingListeners = () => {
       const clicked = e.target.parentElement;
       const sku = getSkuFromProductItem(clicked);
       items.push(sku);
-      saveCartItems(items);
+      await saveCartItems(items);
       createCartItem(sku);
       getPrices();
     });
   }); 
 };
 
+const emptyCart = () => {
+  emptyCartButton.addEventListener('click', () => {
+    const cartItems = document.getElementsByClassName('cart__item');
+    [...cartItems].forEach((item) => item.remove());
+    localStorage.removeItem('cartItems');
+    priceSection.innerHTML = '';
+  });
+};
+
 window.onload = async () => { 
   await createItems(); 
   addingListeners(); 
   if (localStorage.cartItems) {
-  const cartItems = JSON.parse(getSavedCartItems('cartItems'));
-  cartItems.forEach(async (cartItem) => {
-    await createCartItem(cartItem);
-    await getPrices();
-  });
+    const cartItems = JSON.parse(getSavedCartItems('cartItems'));
+    cartItems.forEach(async (cartItem) => {
+      await createCartItem(cartItem);
+      getPrices();
+    });
   }
+  emptyCart();
 };
