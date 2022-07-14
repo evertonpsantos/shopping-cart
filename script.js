@@ -9,9 +9,7 @@ const getPrices = () => {
     const price = Number(item.innerText.split('$')[1]);
     sum += price;
   });
-  const rightSum = (Math.round(sum / 100)) * 100;
-  const totalPhrase = `Preço Total: ${rightSum}`;
-  priceSection.innerText = totalPhrase;
+  priceSection.innerText = sum;
 };
 
 const addingLoadingElement = () => {
@@ -103,7 +101,7 @@ const emptyCart = () => {
     const cartItems = document.getElementsByClassName('cart__item');
     [...cartItems].forEach((item) => item.remove());
     localStorage.removeItem('cartItems');
-    priceSection.innerText = 'Preço Total: 0';
+    priceSection.innerText = '';
   });
 };
 
