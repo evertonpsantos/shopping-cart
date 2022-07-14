@@ -63,10 +63,11 @@ const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').inn
 
 const cartItemClickListener = async (event) => {
   const product = event.target;
+  product.remove();
   const cartItems = JSON.parse(getSavedCartItems('cartItems'));
+  console.log(cartItems.length);
   const filtered = cartItems.filter((item) => !product.innerText.includes(item));
   await saveCartItems(filtered);
-  product.remove();
   getPrices();
 };
 
@@ -85,15 +86,15 @@ const createCartItem = async (sku) => {
 
 const addingListeners = () => {
   const addButtons = document.getElementsByClassName('item__add');
+  const items = [];
   [...addButtons].forEach((element) => {
-    const items = [];
     element.addEventListener('click', async (e) => {
       const clicked = e.target.parentElement;
       const sku = getSkuFromProductItem(clicked);
       items.push(sku);
-      saveCartItems(items);
       await createCartItem(sku);
       getPrices();
+      saveCartItems(items);
     });
   }); 
 };
@@ -116,7 +117,6 @@ window.onload = async () => {
     const cartItems = JSON.parse(getSavedCartItems('cartItems'));
     cartItems.forEach(async (cartItem) => {
       await createCartItem(cartItem);
-      saveCartItems(cartItem);
       getPrices();
     });
   }
