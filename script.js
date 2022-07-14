@@ -3,14 +3,13 @@ const cartItemSection = document.querySelector('.cart__items');
 const priceSection = document.querySelector('.total-price');
 const emptyCartButton = document.querySelector('.empty-cart');
 
-const getPrices = async () => {
-  const cartItem = document.querySelectorAll('.cart__item');
+const getPrices = () => {
   let sum = 0;
-  cartItem.forEach((item) => { 
+  [...document.getElementsByClassName('cart__item')].forEach((item) => { 
     const price = Number(item.innerText.split('$')[1]);
     sum += price;
   });
-  const rightSum = (Math.round(sum)).toFixed(2);
+  const rightSum = (Math.round(sum / 100)) * 100;
   const totalPhrase = `Preço Total: ${rightSum}`;
   priceSection.innerText = totalPhrase;
 };
@@ -66,7 +65,6 @@ const cartItemClickListener = async (event) => {
   const product = event.target;
   product.remove();
   const cartItems = JSON.parse(getSavedCartItems('cartItems'));
-  console.log(cartItems.length);
   const filtered = cartItems.filter((item) => !product.innerText.includes(item));
   await saveCartItems(filtered);
   getPrices();
