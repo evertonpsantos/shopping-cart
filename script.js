@@ -1,31 +1,17 @@
-// const { fetchProducts } = require('./helpers/fetchProducts');
-
-// const saveCartItems = require("./helpers/saveCartItems");
-
-// const getSavedCartItems = require("./helpers/getSavedCartItems");
-
-// const saveCartItems = require("./helpers/saveCartItems");
-
-// const { fetchItem } = require("./helpers/fetchItem");
-
 const itemsSection = document.querySelector('.items');
 const cartItemSection = document.querySelector('.cart__items');
 const priceSection = document.querySelector('.total-price');
 const emptyCartButton = document.querySelector('.empty-cart');
 
-const getPrices = async () => {
+const getPrices = () => {
+  const cartItem = document.querySelectorAll('.cart__item');
   let sum = 0;
-  const cartItems = JSON.parse(getSavedCartItems('cartItems'));
-  if (cartItems.length === 0 || !cartItems) {
-    const totalPhrase = `Preço Total: ${sum}`;
-    priceSection.innerText = totalPhrase;
-  }
-  cartItems.forEach(async (item) => {
-    const { price } = await fetchItem(item);
+  cartItem.forEach((item) => { 
+    const price = Number(item.innerText.split('$')[1]);
     sum += price;
-    const totalPhrase = `Preço Total: ${Math.round(sum)}`;
-    priceSection.innerText = totalPhrase;
   });
+  const totalPhrase = `Preço Total: ${Math.round(sum)}`;
+  priceSection.innerText = totalPhrase;
 };
 
 const addingLoadingElement = () => {
@@ -93,21 +79,20 @@ const createCartItemElement = ({ sku, name, salePrice }) => {
 };
 
 const createCartItem = async (sku) => {
-  const product = await fetchItem(sku);
-  const { id, title, price } = product;
+  const { id, title, price } = await fetchItem(sku);
   cartItemSection.appendChild(createCartItemElement({ sku: id, name: title, salePrice: price }));
 };
 
 const addingListeners = () => {
   const addButtons = document.getElementsByClassName('item__add');
-  const items = [];
   [...addButtons].forEach((element) => {
+    const items = [];
     element.addEventListener('click', async (e) => {
       const clicked = e.target.parentElement;
       const sku = getSkuFromProductItem(clicked);
       items.push(sku);
-      await saveCartItems(items);
-      createCartItem(sku);
+      saveCartItems(items);
+      await createCartItem(sku);
       getPrices();
     });
   }); 
@@ -131,6 +116,7 @@ window.onload = async () => {
     const cartItems = JSON.parse(getSavedCartItems('cartItems'));
     cartItems.forEach(async (cartItem) => {
       await createCartItem(cartItem);
+      saveCartItems(cartItem);
       getPrices();
     });
   }
