@@ -4,6 +4,7 @@ const priceSection = document.querySelector('.total-price');
 const emptyCartButton = document.querySelector('.empty-cart');
 const cartIcon = document.querySelector('.material-icons');
 const cartContainer = document.querySelector('.cart');
+const pageContainer = document.querySelector('.container');
 
 const showCartSection = () => {
   cartIcon.addEventListener('click', () => {
@@ -137,12 +138,32 @@ const emptyCart = () => {
   });
 };
 
-const initialRendering = () => {
+const recoverCartItems = () => {
   const cartItems = JSON.parse(getSavedCartItems('cartItems'));
   cartItemSection.innerHTML = cartItems;
   [...document.querySelectorAll('.delete-item')].forEach((deleteButton) => {
     deleteButton.addEventListener('click', cartItemClickListener);
   });
+};
+
+const showScrollTopButton = () => {
+  const scrollButton = document.querySelector('.scroll-top');
+  const scroll = document.documentElement.scrollTop;
+  if (scroll > 500) {
+    scrollButton.style.display = 'block';
+  } else {
+    scrollButton.style.display = 'none';
+  }
+};
+
+const scrollTop = () => {
+  const scrollTopButton = document.createElement('button');
+  scrollTopButton.classList.add('scroll-top');
+  scrollTopButton.innerText = '⬆️';
+  scrollTopButton.addEventListener('click', () => {
+    document.documentElement.scrollTop = 0;
+  })
+  pageContainer.appendChild(scrollTopButton);
 };
 
 window.onload = async () => { 
@@ -151,11 +172,16 @@ window.onload = async () => {
   addingListeners(); 
   removingLoadingElement();
   if (localStorage.cartItems) {
-    initialRendering();
+    recoverCartItems();
     cartContainer.classList.remove('hide');
     emptyCartButton.classList.remove('hide');
   }
   getPrices();
   emptyCart();
   showCartSection();
+  scrollTop();
 };
+
+window.onscroll = () => showScrollTopButton();
+
+// Update
